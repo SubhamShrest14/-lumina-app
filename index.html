@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>LUMINA — Spiritual Manifestation</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B1120;--bg2:#0f1a2e;--bg3:#1a2540;
+  --gold:#D4AF37;--gold2:#f5dc6e;--gold3:rgba(212,175,55,0.12);
+  --silver:#c0d0e8;--muted:#4a6080;--white:#e8f0ff;
+  --danger:#e05050;--success:#50c878;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;min-height:100%;background:var(--bg);overflow-x:hidden;}
+body{font-family:'Cormorant Garamond',serif;color:var(--silver);}
+
+/* STARS */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d,3s) infinite alternate;}
+@keyframes tw{from{opacity:.03}to{opacity:var(--o,.5)}}
+
+/* SCREENS */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+
+/* ══ AUTH SCREEN ══ */
+#screen-auth{min-height:100vh;display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;}
+#screen-auth.active{display:flex;}
+.auth-logo{font-family:'Cinzel',serif;font-size:32px;color:var(--gold);letter-spacing:6px;margin-bottom:6px;text-align:center;}
+.auth-sub{font-size:11px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-bottom:40px;text-align:center;}
+.auth-card{background:rgba(15,26,46,0.9);border:0.5px solid rgba(212,175,55,0.25);border-radius:20px;padding:32px 28px;width:100%;max-width:380px;backdrop-filter:blur(10px);}
+.auth-tabs{display:flex;margin-bottom:28px;background:var(--bg3);border-radius:10px;padding:4px;}
+.auth-tab{flex:1;padding:9px;text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--muted);cursor:pointer;border-radius:8px;transition:.25s;border:none;background:none;}
+.auth-tab.on{background:rgba(212,175,55,0.15);color:var(--gold);}
+.auth-form{display:none;flex-direction:column;gap:14px;}
+.auth-form.on{display:flex;}
+.inp-wrap{display:flex;flex-direction:column;gap:6px;}
+.inp-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--muted);}
+.inp{background:rgba(11,17,32,0.8);border:0.5px solid rgba(212,175,55,0.25);border-radius:10px;padding:13px 16px;color:var(--white);font-family:'Cormorant Garamond',serif;font-size:15px;outline:none;transition:.2s;width:100%;}
+.inp:focus{border-color:rgba(212,175,55,0.6);}
+.inp::placeholder{color:var(--muted);}
+.auth-btn{background:linear-gradient(135deg,#D4AF37,#9a7e1f);color:#0B1120;font-family:'Cinzel',serif;font-size:13px;font-weight:700;padding:14px;border-radius:12px;border:none;cursor:pointer;letter-spacing:2px;margin-top:4px;transition:.2s;}
+.auth-btn:hover{opacity:.9;}
+.auth-err{font-size:13px;color:var(--danger);text-align:center;min-height:18px;}
+.auth-success{font-size:13px;color:var(--success);text-align:center;}
+
+/* ══ MAIN APP ══ */
+#screen-app{min-height:100vh;}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:0.5px solid rgba(212,175,55,.2);background:var(--bg);position:sticky;top:0;z-index:100;}
+.logo-text{font-family:'Cinzel',serif;color:var(--gold);font-size:16px;letter-spacing:4px;}
+.logo-sub{font-size:9px;letter-spacing:3px;color:var(--muted);margin-top:1px;}
+.clock-time{font-family:'Cinzel',serif;font-size:20px;color:var(--gold2);letter-spacing:3px;text-align:center;}
+.clock-date{font-size:9px;letter-spacing:2px;color:var(--muted);text-align:center;margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.royal-pill{background:linear-gradient(135deg,#D4AF37,#9a7e1f);color:#0B1120;font-family:'Cinzel',serif;font-size:9px;padding:5px 12px;border-radius:16px;font-weight:700;letter-spacing:1px;cursor:pointer;border:none;white-space:nowrap;}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(212,175,55,.15);border:0.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:13px;color:var(--gold);cursor:pointer;}
+
+/* NAV */
+nav{display:flex;background:var(--bg);border-bottom:0.5px solid rgba(212,175,55,.12);position:sticky;top:61px;z-index:99;}
+.nav-tab{flex:1;padding:11px 2px;text-align:center;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--muted);background:var(--bg);border:none;border-bottom:2px solid transparent;cursor:pointer;transition:.25s;}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PANEL */
+.panel{display:none;padding:18px;flex-direction:column;gap:14px;}
+.panel.active{display:flex;}
+.sec-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.sec-title::after{content:'';flex:1;height:.5px;background:rgba(212,175,55,.15);}
+
+/* AFFIRMATION */
+.aff-orb{width:180px;height:180px;border-radius:50%;margin:0 auto;border:1px solid var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .3s;background:radial-gradient(circle at 40% 40%,rgba(212,175,55,.08),transparent 70%);}
+.aff-orb:hover{transform:scale(1.04);}
+.aff-orb::before{content:'';position:absolute;inset:12px;border-radius:50%;border:.5px solid rgba(212,175,55,.3);}
+.aff-orb::after{content:'';position:absolute;inset:26px;border-radius:50%;border:.5px solid rgba(212,175,55,.15);}
+.orb-inner{text-align:center;z-index:1;}
+.orb-sym{font-size:28px;color:var(--gold);display:block;}
+.orb-hint{font-size:9px;letter-spacing:3px;color:var(--muted);margin-top:3px;}
+.aff-text{font-size:18px;font-style:italic;text-align:center;color:var(--gold2);line-height:1.65;transition:opacity .35s;padding:0 4px;min-height:66px;}
+.aff-cat{text-align:center;font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--muted);}
+.card{background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.18);border-radius:14px;padding:14px 16px;}
+.card-row{display:flex;justify-content:space-between;align-items:center;}
+.card-title{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:1px;}
+.card-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* TOGGLE */
+.tog{position:relative;width:44px;height:24px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.tog-t{position:absolute;inset:0;border-radius:12px;background:var(--bg3);border:1px solid rgba(212,175,55,.3);transition:.3s;}
+.tog-th{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.3s;}
+.tog input:checked+.tog-t{background:rgba(212,175,55,.2);border-color:var(--gold);}
+.tog input:checked+.tog-t+.tog-th{left:23px;background:var(--gold);}
+
+/* AUDIO */
+.freq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.freq-card{background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.18);border-radius:14px;padding:13px;cursor:pointer;position:relative;transition:.25s;overflow:hidden;}
+.freq-card:hover{background:rgba(212,175,55,.08);border-color:rgba(212,175,55,.35);}
+.freq-card.playing{border-color:var(--gold);background:rgba(212,175,55,.1);}
+.freq-card.locked{opacity:.55;}
+.freq-hz{font-family:'Cinzel',serif;font-size:22px;color:var(--gold);line-height:1;}
+.freq-name{font-size:12px;color:var(--silver);margin:3px 0 2px;}
+.freq-tag{font-size:9px;letter-spacing:2px;color:var(--muted);}
+.lock-icon{position:absolute;top:9px;right:9px;background:rgba(212,175,55,.15);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);}
+.wave-bars{display:flex;gap:3px;align-items:flex-end;height:16px;margin-top:7px;}
+.wb{width:3px;background:var(--gold);border-radius:2px;animation:wb var(--s,.7s) ease-in-out infinite alternate;}
+@keyframes wb{from{height:3px}to{height:var(--h,14px)}}
+.player-bar{background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.18);border-radius:14px;padding:14px 16px;}
+.player-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:var(--gold);margin-bottom:5px;}
+.player-name{font-size:14px;color:var(--gold2);margin-bottom:8px;}
+.prog-track{background:rgba(212,175,55,.15);border-radius:3px;height:3px;cursor:pointer;margin-bottom:5px;}
+.prog-fill{background:var(--gold);border-radius:3px;height:3px;width:0%;transition:.1s;pointer-events:none;}
+.time-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;}
+.player-ctrls{display:flex;align-items:center;justify-content:center;gap:18px;}
+.ctrl{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;transition:.2s;padding:3px;}
+.ctrl:hover,.ctrl.on{color:var(--gold);}
+.play-circle{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold);background:rgba(212,175,55,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;color:var(--gold);font-size:18px;}
+.play-circle:hover{background:rgba(212,175,55,.22);}
+
+/* BREATHE */
+.breath-hdr{text-align:center;}
+.breath-phase{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);letter-spacing:4px;}
+.breath-count{font-family:'Cinzel',serif;font-size:52px;color:var(--gold2);line-height:1.1;}
+.breath-sub{font-size:11px;letter-spacing:2px;color:var(--muted);margin-top:3px;}
+.geo-wrap{width:220px;height:220px;margin:0 auto;}
+.geo-wrap svg{width:100%;height:100%;}
+#geo-group{transform-origin:120px 120px;transition:transform 4s ease-in-out;}
+.breath-btns{display:flex;gap:10px;}
+.breath-btn{flex:1;padding:12px;border-radius:12px;border:.5px solid rgba(212,175,55,.28);background:rgba(212,175,55,.06);color:var(--gold);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;cursor:pointer;transition:.2s;}
+.breath-btn.primary{border-color:var(--gold);background:rgba(212,175,55,.14);}
+
+/* ANGEL */
+.sched-item{display:flex;align-items:center;gap:11px;background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.14);border-radius:12px;padding:10px 13px;cursor:pointer;position:relative;overflow:hidden;transition:.25s;margin-bottom:7px;}
+.sched-item:hover{background:rgba(212,175,55,.09);border-color:rgba(212,175,55,.32);}
+.sched-item.next{border-color:var(--gold);background:rgba(212,175,55,.08);}
+.sched-item.done{opacity:.35;}
+.next-badge{position:absolute;top:6px;right:9px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);}
+.sched-time{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);min-width:44px;letter-spacing:1px;}
+.sched-num{font-family:'Cinzel',serif;font-size:17px;min-width:40px;}
+.sched-inf{flex:1;}
+.sched-meaning{font-size:12px;color:var(--white);}
+.sched-tag{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:1px;text-transform:uppercase;}
+.sched-cd{font-family:'Cinzel',serif;font-size:10px;color:var(--muted);text-align:right;min-width:48px;}
+.sched-cd span{font-size:12px;color:var(--gold2);display:block;}
+
+/* JOURNAL */
+.journal-wrap{position:relative;min-height:380px;}
+.journal-lock{position:absolute;inset:0;background:rgba(11,17,32,.92);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;border-radius:14px;cursor:pointer;z-index:10;gap:10px;padding:24px;}
+.method-card{background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.2);border-radius:14px;padding:14px;}
+.method-num{font-family:'Cinzel',serif;font-size:30px;color:var(--gold);line-height:1;}
+.method-label{font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:9px;text-transform:uppercase;}
+.method-ta{width:100%;background:rgba(11,17,32,.7);border:.5px solid rgba(212,175,55,.25);border-radius:8px;color:var(--silver);font-family:'Cormorant Garamond',serif;font-size:14px;padding:10px 12px;resize:none;outline:none;transition:.2s;}
+.method-ta:focus{border-color:rgba(212,175,55,.5);}
+.rep-dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px;}
+.rep-dot{width:22px;height:22px;border-radius:50%;border:1px solid rgba(212,175,55,.3);cursor:pointer;transition:.2s;}
+.rep-dot.filled{background:var(--gold);border-color:var(--gold);}
+.seal-btn{width:100%;padding:12px;border-radius:10px;background:rgba(212,175,55,.08);border:.5px solid var(--gold);color:var(--gold);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;cursor:pointer;transition:.2s;}
+.seal-btn:hover{background:rgba(212,175,55,.18);}
+
+/* ══ DASHBOARD SCREEN ══ */
+#screen-dashboard{min-height:100vh;padding:20px;}
+.dash-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.dash-title{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);letter-spacing:3px;}
+.back-btn{background:none;border:.5px solid rgba(212,175,55,.3);color:var(--gold);font-family:'Cinzel',serif;font-size:10px;padding:7px 14px;border-radius:20px;cursor:pointer;letter-spacing:1px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.stat-card{background:rgba(212,175,55,.06);border:.5px solid rgba(212,175,55,.2);border-radius:14px;padding:14px;}
+.stat-val{font-family:'Cinzel',serif;font-size:26px;color:var(--gold2);}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:1px;}
+.pay-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:rgba(212,175,55,.04);border:.5px solid rgba(212,175,55,.14);border-radius:10px;margin-bottom:7px;}
+.pay-id{font-size:11px;color:var(--muted);font-family:monospace;}
+.pay-amt{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);}
+.pay-date{font-size:11px;color:var(--muted);}
+.pay-status{font-size:10px;padding:3px 9px;border-radius:12px;background:rgba(80,200,120,.15);color:var(--success);letter-spacing:1px;}
+.angel-hist-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:9px;background:rgba(255,255,255,.02);margin-bottom:5px;}
+
+/* ══ ADMIN SCREEN ══ */
+#screen-admin{min-height:100vh;padding:20px;}
+.admin-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.admin-stat{background:rgba(212,175,55,.06);border:.5px solid rgba(212,175,55,.2);border-radius:14px;padding:16px;}
+.admin-stat-val{font-family:'Cinzel',serif;font-size:28px;color:var(--gold2);}
+.admin-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:.5px solid rgba(212,175,55,.15);}
+td{padding:9px 10px;border-bottom:.5px solid rgba(212,175,55,.06);color:var(--silver);}
+.badge-royal{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(212,175,55,.15);color:var(--gold);letter-spacing:1px;}
+.badge-free{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.05);color:var(--muted);letter-spacing:1px;}
+
+/* PORTAL */
+#portal{display:none;position:fixed;inset:0;z-index:999;background:rgba(8,12,22,.97);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:28px;}
+#portal.show{display:flex;animation:fadeIn .5s ease;}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.portal-ring{width:170px;height:170px;border-radius:50%;border:1px solid var(--gold);margin-bottom:18px;display:flex;align-items:center;justify-content:center;position:relative;animation:rP 2.5s ease-in-out infinite;}
+@keyframes rP{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.4)}50%{box-shadow:0 0 0 22px rgba(212,175,55,0)}}
+.portal-ring::before{content:'';position:absolute;inset:13px;border-radius:50%;border:.5px solid rgba(212,175,55,.35);}
+#portal-num{font-family:'Cinzel',serif;font-size:46px;color:var(--gold2);letter-spacing:5px;line-height:1;}
+#portal-meaning{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:4px;margin:9px 0 5px;}
+#portal-aff{font-size:16px;font-style:italic;color:var(--white);line-height:1.75;max-width:290px;margin-bottom:9px;}
+#portal-freq{font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:16px;}
+.p-btn{background:rgba(212,175,55,.1);border:1px solid var(--gold);border-radius:26px;padding:11px 28px;font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;cursor:pointer;margin-bottom:10px;}
+.p-cls{background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;}
+
+/* PAYWALL */
+#paywall{display:none;position:fixed;inset:0;z-index:998;background:rgba(8,12,22,.97);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px;}
+#paywall.show{display:flex;animation:fadeIn .4s ease;}
+.pw-crown{font-size:48px;margin-bottom:12px;}
+.pw-title{font-family:'Cinzel',serif;font-size:24px;color:var(--gold);letter-spacing:3px;margin-bottom:7px;}
+.pw-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:18px;max-width:280px;}
+.pw-card{background:rgba(212,175,55,.08);border:1px solid var(--gold);border-radius:16px;padding:20px 28px;width:100%;max-width:300px;margin-bottom:14px;}
+.pw-price{font-family:'Cinzel',serif;font-size:32px;color:var(--gold2);}
+.pw-period{font-size:12px;color:var(--muted);margin-bottom:11px;}
+.pw-feature{font-size:13px;color:var(--silver);padding:3px 0;text-align:left;}
+.pw-cta{background:linear-gradient(135deg,#D4AF37,#9a7e1f);color:#0B1120;font-family:'Cinzel',serif;font-size:13px;font-weight:700;padding:14px 36px;border-radius:28px;border:none;cursor:pointer;letter-spacing:2px;width:100%;max-width:300px;margin-bottom:11px;}
+.pw-div{display:flex;align-items:center;gap:11px;width:100%;max-width:300px;margin-bottom:11px;}
+.pw-line{flex:1;height:.5px;background:rgba(212,175,55,.2);}
+.pw-or{font-size:10px;color:var(--muted);letter-spacing:2px;}
+.pw-ad{background:none;border:1px solid rgba(212,175,55,.3);color:var(--gold);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:10px 24px;border-radius:24px;cursor:pointer;width:100%;max-width:300px;margin-bottom:12px;}
+.pw-skip{background:none;border:none;color:var(--muted);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;cursor:pointer;}
+
+/* TOAST */
+#toast{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:997;background:var(--bg3);border:1px solid var(--gold);border-radius:14px;padding:10px 20px;text-align:center;white-space:nowrap;animation:toastIn .4s ease;}
+#toast.show{display:block;}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast-num{font-family:'Cinzel',serif;font-size:20px;color:var(--gold2);letter-spacing:3px;}
+.toast-txt{font-size:10px;color:var(--muted);letter-spacing:2px;}
+
+/* LOADING */
+#loading{display:none;position:fixed;inset:0;z-index:9999;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+#loading.show{display:flex;}
+.loading-ring{width:60px;height:60px;border-radius:50%;border:1px solid rgba(212,175,55,.3);border-top-color:var(--gold);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:4px;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(212,175,55,.2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- LOADING -->
+<div id="loading" class="show">
+  <div class="loading-ring"></div>
+  <div class="loading-txt">LUMINA</div>
+</div>
+
+<!-- PORTAL -->
+<div id="portal">
+  <div class="portal-ring"><div id="portal-num">11:11</div></div>
+  <div id="portal-meaning">MASTER PORTAL</div>
+  <div id="portal-aff">The universe is listening.</div>
+  <div id="portal-freq">✦ 111 Hz · Portal Activation</div>
+  <button class="p-btn" onclick="openIntention()">✦ Set Your Intention Now ✦</button><br>
+  <button class="p-cls" onclick="dismissPortal()">✕ close</button>
+</div>
+
+<!-- PAYWALL -->
+<div id="paywall">
+  <div class="pw-crown">♛</div>
+  <div class="pw-title">Royal Access</div>
+  <div class="pw-sub">Unlock everything for just ₹22 — full 2 weeks, cancel anytime.</div>
+  <div class="pw-card">
+    <div class="pw-price">₹22</div>
+    <div class="pw-period">for 2 weeks · cancel anytime</div>
+    <div class="pw-feature">✦ 888 Hz Money Frequency</div>
+    <div class="pw-feature">✦ 963 Hz Crown Chakra</div>
+    <div class="pw-feature">✦ 369 Manifestation Journal</div>
+    <div class="pw-feature">✦ All angel number portal tools</div>
+    <div class="pw-feature">✦ Background audio looping</div>
+  </div>
+  <button class="pw-cta" onclick="startRazorpay()">♛ Begin Royal Journey — ₹22</button>
+  <div class="pw-div"><div class="pw-line"></div><div class="pw-or">OR</div><div class="pw-line"></div></div>
+  <button class="pw-ad" id="pw-ad-btn" onclick="watchAd()">▶ Watch Ad · Unlock 24 Hours Free</button>
+  <button class="pw-skip" onclick="closePaywall()">✕ maybe later</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"><div class="toast-num" id="toast-num">1:11</div><div class="toast-txt" id="toast-txt">PORTAL OPEN</div></div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="screen-auth" class="screen">
+  <div class="auth-logo">✦ LUMINA</div>
+  <div class="auth-sub">Spiritual Manifestation</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="authTab('login',this)">Sign In</button>
+      <button class="auth-tab" onclick="authTab('register',this)">Register</button>
+    </div>
+    <!-- Login -->
+    <form class="auth-form on" id="form-login" onsubmit="doLogin(event)">
+      <div class="inp-wrap"><div class="inp-label">Email</div><input class="inp" type="email" id="login-email" placeholder="your@email.com" required></div>
+      <div class="inp-wrap"><div class="inp-label">Password</div><input class="inp" type="password" id="login-pass" placeholder="••••••••" required></div>
+      <div class="auth-err" id="login-err"></div>
+      <button class="auth-btn" type="submit">✦ Enter the Sanctuary</button>
+    </form>
+    <!-- Register -->
+    <form class="auth-form" id="form-register" onsubmit="doRegister(event)">
+      <div class="inp-wrap"><div class="inp-label">Your Name</div><input class="inp" type="text" id="reg-name" placeholder="Sacred name" required></div>
+      <div class="inp-wrap"><div class="inp-label">Email</div><input class="inp" type="email" id="reg-email" placeholder="your@email.com" required></div>
+      <div class="inp-wrap"><div class="inp-label">Password</div><input class="inp" type="password" id="reg-pass" placeholder="Min 6 characters" required minlength="6"></div>
+      <div class="auth-err" id="reg-err"></div>
+      <button class="auth-btn" type="submit">✦ Begin My Journey</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ MAIN APP SCREEN ══ -->
+<div id="screen-app" class="screen">
+  <header>
+    <div><div class="logo-text">✦ LUMINA</div><div class="logo-sub">Manifestation</div></div>
+    <div><div class="clock-time" id="clock">--:--</div><div class="clock-date" id="clock-date"></div></div>
+    <div class="hdr-right">
+      <button class="royal-pill" id="royal-pill" onclick="showPaywall()">♛ Royal</button>
+      <div class="user-avatar" id="user-avatar" onclick="showScreen('dashboard')" title="My Dashboard">U</div>
+    </div>
+  </header>
+  <nav>
+    <button class="nav-tab active" onclick="switchTab('affirm',this)">Affirm</button>
+    <button class="nav-tab" onclick="switchTab('audio',this)">Sounds</button>
+    <button class="nav-tab" onclick="switchTab('breathe',this)">Breathe</button>
+    <button class="nav-tab" onclick="switchTab('angel',this)">Angels</button>
+    <button class="nav-tab" onclick="switchTab('journal',this)">Journal</button>
+  </nav>
+
+  <!-- AFFIRM -->
+  <div class="panel active" id="panel-affirm">
+    <div class="sec-title">Daily Affirmation</div>
+    <div class="aff-orb" onclick="nextAffirmation()">
+      <div class="orb-inner"><span class="orb-sym">✦</span><span class="orb-hint">Tap to reveal</span></div>
+    </div>
+    <div class="aff-text" id="aff-text"></div>
+    <div class="aff-cat" id="aff-cat"></div>
+    <div class="card"><div class="card-row"><div><div class="card-title">Angel Alerts</div><div class="card-sub">Auto-fires at every sacred moment</div></div><label class="tog"><input type="checkbox" id="alert-tog" checked><div class="tog-t"></div><div class="tog-th"></div></label></div></div>
+    <div class="card"><div class="card-row"><div><div class="card-title">Morning Ritual</div><div class="card-sub">6 AM · Affirmation + intention</div></div><label class="tog"><input type="checkbox"><div class="tog-t"></div><div class="tog-th"></div></label></div></div>
+  </div>
+
+  <!-- AUDIO -->
+  <div class="panel" id="panel-audio">
+    <div class="sec-title">Solfeggio Frequencies</div>
+    <div class="freq-grid">
+      <div class="freq-card" id="fc-528" onclick="playFreq('528')"><div class="freq-hz">528 Hz</div><div class="freq-name">Heart Chakra</div><div class="freq-tag">LOVE · HEALING</div><div class="wave-bars" id="wb-528" style="display:none"><div class="wb" style="--s:.6s;--h:13px"></div><div class="wb" style="--s:.9s;--h:16px"></div><div class="wb" style="--s:.7s;--h:9px"></div><div class="wb" style="--s:.8s;--h:14px"></div></div></div>
+      <div class="freq-card locked" id="fc-888" onclick="playFreq('888')"><div class="freq-hz">888 Hz</div><div class="freq-name">Money Attract</div><div class="freq-tag">ABUNDANCE · FLOW</div><div class="lock-icon">♛</div></div>
+      <div class="freq-card" id="fc-417" onclick="playFreq('417')"><div class="freq-hz">417 Hz</div><div class="freq-name">Aura Cleansing</div><div class="freq-tag">RELEASE · CLARITY</div><div class="wave-bars" id="wb-417" style="display:none"><div class="wb" style="--s:.7s;--h:11px"></div><div class="wb" style="--s:.5s;--h:16px"></div><div class="wb" style="--s:.9s;--h:7px"></div><div class="wb" style="--s:.6s;--h:13px"></div></div></div>
+      <div class="freq-card locked" id="fc-963" onclick="playFreq('963')"><div class="freq-hz">963 Hz</div><div class="freq-name">Crown Chakra</div><div class="freq-tag">AWAKENING · LIGHT</div><div class="lock-icon">♛</div></div>
+      <div class="freq-card" id="fc-333" onclick="playFreq('333')"><div class="freq-hz">333 Hz</div><div class="freq-name">Creative Flow</div><div class="freq-tag">ASCENDED MASTERS</div><div class="wave-bars" id="wb-333" style="display:none"><div class="wb" style="--s:.8s;--h:14px"></div><div class="wb" style="--s:.6s;--h:10px"></div><div class="wb" style="--s:.7s;--h:16px"></div><div class="wb" style="--s:.9s;--h:8px"></div></div></div>
+      <div class="freq-card locked" id="fc-111" onclick="playFreq('111')"><div class="freq-hz">111 Hz</div><div class="freq-name">Portal Tone</div><div class="freq-tag">NEW BEGINNINGS</div><div class="lock-icon">♛</div></div>
+    </div>
+    <div class="player-bar">
+      <div class="player-title">NOW PLAYING</div>
+      <div class="player-name" id="player-name">Select a frequency above</div>
+      <div class="prog-track" onclick="seekAudio(event,this)"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="time-row"><span id="time-cur">0:00</span><span>∞ loop</span><span>—</span></div>
+      <div class="player-ctrls">
+        <button class="ctrl on" id="loop-btn" onclick="toggleLoop()">↻</button>
+        <div class="play-circle" onclick="togglePlay()" id="play-btn">▶</div>
+        <button class="ctrl" onclick="stopAudio()">◼</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREATHE -->
+  <div class="panel" id="panel-breathe">
+    <div class="breath-hdr">
+      <div class="breath-phase" id="bp-phase">INHALE</div>
+      <div class="breath-count" id="bp-count">4</div>
+      <div class="breath-sub" id="bp-sub">Breathe with the sacred geometry</div>
+    </div>
+    <div class="geo-wrap">
+      <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+        <g id="geo-group" style="transform:scale(0.72)">
+          <circle cx="120" cy="120" r="110" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.35"/>
+          <circle cx="120" cy="70"  r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="120" cy="170" r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="163" cy="95"  r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="77"  cy="95"  r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="163" cy="145" r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="77"  cy="145" r="50" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.45"/>
+          <circle cx="120" cy="120" r="50" fill="rgba(212,175,55,0.04)" stroke="#D4AF37" stroke-width="1" opacity="0.75"/>
+          <polygon points="120,82 150,136 90,136" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.55"/>
+          <polygon points="120,158 150,104 90,104" fill="none" stroke="#D4AF37" stroke-width="0.5" opacity="0.55"/>
+          <circle cx="120" cy="120" r="5" fill="#D4AF37" opacity="0.85"/>
+        </g>
+      </svg>
+    </div>
+    <div class="breath-btns">
+      <button class="breath-btn" onclick="resetBreath()">Reset</button>
+      <button class="breath-btn primary" id="breath-btn" onclick="toggleBreath()">Begin Session</button>
+    </div>
+  </div>
+
+  <!-- ANGEL -->
+  <div class="panel" id="panel-angel">
+    <div class="sec-title">Today's Angelic Timeline</div>
+    <div id="schedule-list"></div>
+    <div class="sec-title" style="margin-top:6px">History</div>
+    <div id="hist-list"><div style="font-size:13px;font-style:italic;color:var(--muted);padding:4px 0;">No moments yet today…</div></div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="panel" id="panel-journal">
+    <div class="sec-title">369 Method</div>
+    <div class="journal-wrap" id="journal-wrap">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="method-card"><div class="method-num">3</div><div class="method-label">Morning · write 3 times</div><textarea class="method-ta" rows="2" id="j-morning" placeholder="I am grateful that I have…"></textarea></div>
+        <div class="method-card"><div class="method-num">6</div><div class="method-label">Afternoon · tap each to complete</div><div class="rep-dots" id="dots-6"></div></div>
+        <div class="method-card"><div class="method-num">9</div><div class="method-label">Night · tap each to complete</div><div class="rep-dots" id="dots-9"></div></div>
+        <button class="seal-btn" onclick="sealJournal()">✦ Seal Intention into the Universe ✦</button>
+      </div>
+      <div class="journal-lock" id="journal-lock" onclick="showPaywall()">
+        <div style="font-size:40px">♛</div>
+        <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);letter-spacing:2px">Royal Members Only</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;max-width:220px">Unlock the 369 Journal with Royal Access for ₹22</div>
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--gold);letter-spacing:3px;margin-top:4px">TAP TO UNLOCK →</div>
+      </div>
+    </div>
+  </div>
+</div><!-- end screen-app -->
+
+<!-- ══ DASHBOARD SCREEN ══ -->
+<div id="screen-dashboard" class="screen" style="background:var(--bg);min-height:100vh;padding:20px;">
+  <div class="dash-hdr">
+    <div class="dash-title">My Dashboard</div>
+    <button class="back-btn" onclick="showScreen('app')">← Back</button>
+  </div>
+  <div id="dash-welcome" style="font-size:16px;font-style:italic;color:var(--gold2);margin-bottom:18px;"></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-val" id="dash-status">Free</div><div class="stat-label">Current Plan</div></div>
+    <div class="stat-card"><div class="stat-val" id="dash-paid">₹0</div><div class="stat-label">Total Paid</div></div>
+    <div class="stat-card"><div class="stat-val" id="dash-expiry">—</div><div class="stat-label">Royal Until</div></div>
+    <div class="stat-card"><div class="stat-val" id="dash-angels">0</div><div class="stat-label">Angel Moments</div></div>
+  </div>
+  <div class="sec-title" style="margin-bottom:12px">Payment History</div>
+  <div id="dash-payments"><div style="font-size:13px;font-style:italic;color:var(--muted);">No payments yet.</div></div>
+  <div class="sec-title" style="margin:16px 0 12px">Angel Number History</div>
+  <div id="dash-angel-hist"><div style="font-size:13px;font-style:italic;color:var(--muted);">No angel moments logged yet.</div></div>
+  <button style="margin-top:24px;width:100%;padding:12px;border-radius:10px;background:rgba(224,80,80,.1);border:.5px solid rgba(224,80,80,.3);color:var(--danger);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;cursor:pointer;" onclick="logout()">Sign Out</button>
+</div>
+
+<!-- ══ ADMIN SCREEN ══ -->
+<div id="screen-admin" class="screen" style="background:var(--bg);min-height:100vh;padding:20px;">
+  <div class="dash-hdr">
+    <div class="dash-title">Admin Panel</div>
+    <button class="back-btn" onclick="showScreen('app')">← Back</button>
+  </div>
+  <div class="admin-stat-grid">
+    <div class="admin-stat"><div class="admin-stat-val" id="adm-users">—</div><div class="admin-stat-lbl">Total Users</div></div>
+    <div class="admin-stat"><div class="admin-stat-val" id="adm-royal">—</div><div class="admin-stat-lbl">Royal Members</div></div>
+    <div class="admin-stat"><div class="admin-stat-val" id="adm-payments">—</div><div class="admin-stat-lbl">Payments</div></div>
+    <div class="admin-stat"><div class="admin-stat-val" id="adm-revenue">—</div><div class="admin-stat-lbl">Total Revenue</div></div>
+  </div>
+  <div class="sec-title" style="margin-bottom:12px">All Users</div>
+  <div style="overflow-x:auto;"><table id="adm-users-table"><thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Paid</th><th>Joined</th></tr></thead><tbody></tbody></table></div>
+  <div class="sec-title" style="margin:16px 0 12px">Recent Payments</div>
+  <div style="overflow-x:auto;"><table id="adm-pay-table"><thead><tr><th>User</th><th>Amount</th><th>Payment ID</th><th>Date</th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<script>
+/* ══ DATA ══ */
+const AFFIRMATIONS=[
+  {text:"I am a powerful creator and the universe conspires in my favor.",cat:"abundance"},
+  {text:"Infinite abundance flows to me from expected and unexpected sources.",cat:"wealth"},
+  {text:"I radiate confidence, love, and infinite possibility.",cat:"self-love"},
+  {text:"My vibration attracts everything I desire with effortless ease.",cat:"alignment"},
+  {text:"I am worthy of all the magic and miracles this world holds.",cat:"worthiness"},
+  {text:"Every day I grow closer to the life I have always dreamed of.",cat:"growth"},
+  {text:"The universe is constantly working in my highest good.",cat:"trust"},
+  {text:"I release what no longer serves me and welcome divine abundance.",cat:"release"},
+  {text:"My mind is clear, my heart is open, my path is lit with gold.",cat:"clarity"},
+  {text:"I am aligned with the frequency of love, wealth, and joy.",cat:"frequency"},
+  {text:"Money flows to me like a river — freely and abundantly.",cat:"wealth"},
+  {text:"I am the architect of my reality and I choose magnificence.",cat:"power"},
+];
+
+const ANGELS={
+  '111':{c:['1:11','13:11'],s:'111',m:'Manifestation Portal Open',t:'NEW BEGINNINGS · ALIGNMENT',af:'Your thoughts are seeds of reality. Focus only on what you wish to grow.',fr:'111 Hz',hz:111,pr:'Write one desire as if it already exists.',cl:'#f5dc6e'},
+  '222':{c:['2:22','14:22'],s:'222',m:'Divine Balance & Trust',t:'HARMONY · PATIENCE',af:'Everything is unfolding in divine timing. I trust the sacred plan.',fr:'222 Hz',hz:222,pr:'Breathe and write: "I trust that…"',cl:'#a0e8c0'},
+  '333':{c:['3:33','15:33'],s:'333',m:'Ascended Masters Present',t:'GROWTH · CREATIVITY',af:'The Ascended Masters walk beside me. I am guided and deeply loved.',fr:'333 Hz',hz:333,pr:'Ask your guides one question now.',cl:'#c0a8f8'},
+  '444':{c:['4:44','16:44'],s:'444',m:'Angels Are With You',t:'PROTECTION · STABILITY',af:'I am surrounded by angelic protection. I am safe and exactly where I need to be.',fr:'417 Hz',hz:417,pr:'Feel your feet on the ground. Affirm your safety.',cl:'#80c8f8'},
+  '555':{c:['5:55','17:55'],s:'555',m:'Divine Change Incoming',t:'TRANSFORMATION · FREEDOM',af:'I welcome transformation. Every change is a divine upgrade to greater abundance.',fr:'528 Hz',hz:528,pr:"Name one thing you're ready to release.",cl:'#f8d060'},
+  '777':{c:['7:07','19:07'],s:'777',m:'Spiritual Luck & Alignment',t:'LUCK · WISDOM',af:'I am on the perfect path. The universe confirms my alignment.',fr:'777 Hz',hz:777,pr:'Acknowledge one miracle in your life.',cl:'#d4af37'},
+  '888':{c:['8:08','20:08'],s:'888',m:'Infinite Abundance Flow',t:'WEALTH · PROSPERITY',af:'Infinite abundance flows to me. Money is energy and I am a magnet for it.',fr:'888 Hz',hz:888,pr:'Feel rich. Write your abundance affirmation.',cl:'#f8e880'},
+  '999':{c:['9:09','21:09'],s:'999',m:'Divine Completion & Release',t:'ENDINGS · NEW CYCLE',af:'I release the old with gratitude. A magnificent new chapter begins now.',fr:'963 Hz',hz:963,pr:"Write what you're grateful to release.",cl:'#e0a0ff'},
+  '1010':{c:['10:10','22:10'],s:'10:10',m:'Infinite Potential Unlocked',t:'CREATION · CLARITY',af:'I stand at the threshold of infinite possibility. I choose my highest timeline.',fr:'432 Hz',hz:432,pr:'Describe your highest timeline in 3 words.',cl:'#60d8f8'},
+  '1111':{c:['11:11','23:11'],s:'11:11',m:'Master Portal — Make a Wish',t:'WISH · COSMIC GATEWAY',af:'The veil is thinnest now. Your thoughts travel into the quantum field. Make your wish.',fr:'111 Hz',hz:111,pr:'STOP. Close your eyes. Make your wish.',cl:'#fff8b0'},
+  '1212':{c:['12:12'],s:'12:12',m:'Spiritual Growth Accelerating',t:'ASCENSION · LOVE',af:'My spiritual evolution is accelerating. Love is the foundation of everything I create.',fr:'528 Hz',hz:528,pr:'Affirm your growth: "I am becoming…"',cl:'#a0f8c0'}
+};
+
+const ENTRIES=[];
+for(const[k,d]of Object.entries(ANGELS))for(const t of d.c){const[h,m]=t.split(':').map(Number);ENTRIES.push({k,d,t,h,m,tot:h*60+m});}
+ENTRIES.sort((a,b)=>a.tot-b.tot);
+
+/* ══ STATE ══ */
+let currentUser=null, token=null, isRoyal=false;
+const API = '';  // empty = same origin
+
+/* ══ STARS ══ */
+(function(){const s=document.getElementById('stars');for(let i=0;i<70;i++){const el=document.createElement('div');el.className='star';const sz=Math.random()*2+0.4;el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.3+Math.random()*.6};animation-delay:${Math.random()*5}s;`;s.appendChild(el);}})();
+
+/* ══ SCREEN MANAGEMENT ══ */
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(name==='dashboard') loadDashboard();
+  if(name==='admin') loadAdmin();
+}
+
+/* ══ AUTH ══ */
+function authTab(name,btn){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('form-'+name).classList.add('on');
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  const err=document.getElementById('login-err');
+  err.textContent='';
+  try{
+    const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('login-email').value,password:document.getElementById('login-pass').value})});
+    const data=await res.json();
+    if(!data.success){err.textContent=data.message;return;}
+    onLoginSuccess(data);
+  }catch(ex){err.textContent='Connection error. Is the server running?';}
+}
+
+async function doRegister(e){
+  e.preventDefault();
+  const err=document.getElementById('reg-err');
+  err.textContent='';
+  try{
+    const res=await fetch(API+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('reg-name').value,email:document.getElementById('reg-email').value,password:document.getElementById('reg-pass').value})});
+    const data=await res.json();
+    if(!data.success){err.textContent=data.message;return;}
+    onLoginSuccess(data);
+  }catch(ex){err.textContent='Connection error. Is the server running?';}
+}
+
+function onLoginSuccess(data){
+  token=data.token;
+  currentUser=data.user;
+  localStorage.setItem('lumina_token',token);
+  applyUserState();
+  showScreen('app');
+}
+
+function applyUserState(){
+  if(!currentUser)return;
+  isRoyal=currentUser.isRoyal&&(!currentUser.royalExpiry||new Date()<new Date(currentUser.royalExpiry));
+  const avatar=document.getElementById('user-avatar');
+  if(avatar) avatar.textContent=(currentUser.name||'U')[0].toUpperCase();
+  if(isRoyal){
+    const pill=document.getElementById('royal-pill');
+    if(pill){pill.textContent='♛ Royal Member';pill.style.background='linear-gradient(135deg,#f5dc6e,#c09820)';}
+    const jl=document.getElementById('journal-lock');
+    if(jl) jl.style.display='none';
+    unlockPremiumAudio();
+  }
+  // Check admin
+  if(currentUser.email===getAdminEmail()){
+    const nav=document.querySelector('nav');
+    if(nav&&!document.getElementById('admin-nav-btn')){
+      const ab=document.createElement('button');
+      ab.className='nav-tab';ab.id='admin-nav-btn';
+      ab.textContent='Admin';ab.onclick=()=>showScreen('admin');
+      nav.appendChild(ab);
+    }
+  }
+}
+
+function getAdminEmail(){return 'admin@lumina.app';}
+
+async function checkAuth(){
+  const t=localStorage.getItem('lumina_token');
+  if(!t){hideLoading();showScreen('auth');return;}
+  try{
+    const res=await fetch(API+'/api/auth/me',{headers:{Authorization:'Bearer '+t}});
+    const data=await res.json();
+    if(data.success){token=t;currentUser=data.user;applyUserState();hideLoading();showScreen('app');init();}
+    else{localStorage.removeItem('lumina_token');hideLoading();showScreen('auth');}
+  }catch(ex){
+    // Server offline — run in offline demo mode
+    localStorage.removeItem('lumina_token');
+    hideLoading();showScreen('auth');
+  }
+}
+
+function logout(){
+  localStorage.removeItem('lumina_token');
+  token=null;currentUser=null;isRoyal=false;
+  showScreen('auth');
+}
+
+/* ══ LOADING ══ */
+function hideLoading(){document.getElementById('loading').classList.remove('show');}
+
+/* ══ APP INIT ══ */
+function init(){
+  initAffirmations();
+  buildSchedule();
+  renderHistory();
+  initJournalDots();
+  requestAnimationFrame(()=>{tick();setInterval(tick,1000);});
+}
+
+/* ══ TABS ══ */
+function switchTab(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='journal'&&isRoyal) loadTodayJournal();
+}
+
+/* ══ AFFIRMATIONS ══ */
+let affIdx=0;
+function initAffirmations(){
+  document.getElementById('aff-text').textContent=AFFIRMATIONS[0].text;
+  document.getElementById('aff-cat').textContent='✦ '+AFFIRMATIONS[0].cat+' ✦';
+}
+function nextAffirmation(){
+  const el=document.getElementById('aff-text'),ce=document.getElementById('aff-cat');
+  el.style.opacity='0';
+  setTimeout(()=>{affIdx=(affIdx+1)%AFFIRMATIONS.length;el.textContent=AFFIRMATIONS[affIdx].text;ce.textContent='✦ '+AFFIRMATIONS[affIdx].cat+' ✦';el.style.opacity='1';},300);
+}
+
+/* ══ AUDIO ══ */
+let audioCtx=null,osc=null,gain=null,isPlaying=false,currentFreq=null,isLooping=true,audioStart=0,progInt=null;
+const LOCKED_FREQ=['888','963','111'];
+
+function unlockPremiumAudio(){
+  LOCKED_FREQ.forEach(id=>{
+    const fc=document.getElementById('fc-'+id);
+    if(!fc)return;
+    fc.classList.remove('locked');
+    const li=fc.querySelector('.lock-icon');if(li)li.remove();
+    if(!document.getElementById('wb-'+id)){
+      const wb=document.createElement('div');wb.id='wb-'+id;wb.className='wave-bars';wb.style.display='none';
+      for(let i=0;i<4;i++){const b=document.createElement('div');b.className='wb';b.style.setProperty('--s',(0.5+Math.random()*.5)+'s');b.style.setProperty('--h',(8+Math.random()*10)+'px');wb.appendChild(b);}
+      fc.appendChild(wb);
+    }
+  });
+}
+
+function playFreq(id){
+  if(LOCKED_FREQ.includes(id)&&!isRoyal){showPaywall();return;}
+  stopAudio();
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    osc=audioCtx.createOscillator();gain=audioCtx.createGain();
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.type='sine';osc.frequency.setValueAtTime(parseFloat(id),audioCtx.currentTime);
+    gain.gain.setValueAtTime(0,audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.14,audioCtx.currentTime+0.5);
+    osc.start();isPlaying=true;currentFreq=id;
+    const names={'528':'Heart Chakra','888':'Money Attract','417':'Aura Cleansing','963':'Crown Chakra','333':'Creative Flow','111':'Portal Tone'};
+    document.getElementById('player-name').textContent=id+' Hz · '+(names[id]||'');
+    document.getElementById('play-btn').textContent='⏸';
+    document.querySelectorAll('.freq-card').forEach(c=>c.classList.remove('playing'));
+    document.getElementById('fc-'+id).classList.add('playing');
+    document.querySelectorAll('[id^="wb-"]').forEach(w=>w.style.display='none');
+    const wb=document.getElementById('wb-'+id);if(wb)wb.style.display='flex';
+    audioStart=Date.now();clearInterval(progInt);
+    progInt=setInterval(()=>{
+      if(!isPlaying)return;
+      const e=(Date.now()-audioStart)/1000,m=Math.floor(e/60),s=Math.floor(e%60);
+      document.getElementById('time-cur').textContent=m+':'+(s<10?'0':'')+s;
+      document.getElementById('prog-fill').style.width=((e%60)/60*100)+'%';
+    },500);
+  }catch(e){}
+}
+
+function togglePlay(){if(!currentFreq)return;if(isPlaying){try{gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);setTimeout(()=>{try{osc.stop();}catch(e){}},350);}catch(e){}isPlaying=false;document.getElementById('play-btn').textContent='▶';const wb=document.getElementById('wb-'+currentFreq);if(wb)wb.style.display='none';}else{playFreq(currentFreq);}}
+function stopAudio(){if(osc){try{gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+.3);setTimeout(()=>{try{osc.stop();}catch(e){}},350);}catch(e){}}isPlaying=false;currentFreq=null;document.getElementById('play-btn').textContent='▶';document.getElementById('player-name').textContent='Select a frequency above';document.getElementById('prog-fill').style.width='0%';document.getElementById('time-cur').textContent='0:00';document.querySelectorAll('.freq-card').forEach(c=>c.classList.remove('playing'));document.querySelectorAll('[id^="wb-"]').forEach(w=>w.style.display='none');clearInterval(progInt);}
+function toggleLoop(){isLooping=!isLooping;document.getElementById('loop-btn').className='ctrl'+(isLooping?' on':'');}
+function seekAudio(e,t){document.getElementById('prog-fill').style.width=((e.clientX-t.getBoundingClientRect().left)/t.offsetWidth*100)+'%';}
+
+/* ══ BREATHING ══ */
+const BC=[{phase:'INHALE',count:4,sub:'Draw in golden light',scale:1.18},{phase:'HOLD',count:7,sub:'Let the light expand within',scale:1.18},{phase:'EXHALE',count:8,sub:'Release all that does not serve',scale:0.68},{phase:'REST',count:2,sub:'Rest in perfect stillness',scale:0.68}];
+let breathActive=false,breathPhase=0,breathTimer=4,breathInt=null;
+function toggleBreath(){if(breathActive){clearInterval(breathInt);breathActive=false;document.getElementById('breath-btn').textContent='Begin Session';document.getElementById('bp-phase').textContent='INHALE';document.getElementById('bp-count').textContent='4';document.getElementById('bp-sub').textContent='Breathe with the sacred geometry';setGeo(0.72);}else{breathActive=true;breathPhase=0;breathTimer=BC[0].count;document.getElementById('breath-btn').textContent='End Session';runBreath();breathInt=setInterval(breathTick,1000);}}
+function runBreath(){const c=BC[breathPhase];document.getElementById('bp-phase').textContent=c.phase;document.getElementById('bp-count').textContent=breathTimer;document.getElementById('bp-sub').textContent=c.sub;setGeo(c.scale);}
+function breathTick(){breathTimer--;document.getElementById('bp-count').textContent=breathTimer;if(breathTimer<=0){breathPhase=(breathPhase+1)%BC.length;breathTimer=BC[breathPhase].count;runBreath();}}
+function setGeo(s){const g=document.getElementById('geo-group');g.style.transition='transform '+(breathActive?BC[breathPhase].count*.85:1.2)+'s ease-in-out';g.style.transform='scale('+s+')';}
+function resetBreath(){clearInterval(breathInt);breathActive=false;breathPhase=0;breathTimer=4;document.getElementById('breath-btn').textContent='Begin Session';document.getElementById('bp-phase').textContent='INHALE';document.getElementById('bp-count').textContent='4';document.getElementById('bp-sub').textContent='Breathe with the sacred geometry';setGeo(0.72);}
+
+/* ══ SCHEDULE ══ */
+function buildSchedule(){
+  const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+  let nxt=false;
+  document.getElementById('schedule-list').innerHTML=ENTRIES.map(e=>{
+    const passed=e.tot<nm,isN=!passed&&!nxt&&(nxt=true),diff=e.tot-nm;
+    const dh=Math.floor(diff/60),dm=diff%60,lbl=diff<=0?'':dh>0?dh+'h '+dm+'m':dm+'m';
+    return `<div class="sched-item${isN?' next':''}${passed?' done':''}" onclick="fireAngel('${e.k}',true)">${isN?'<div class="next-badge">NEXT ✦</div>':''}<div class="sched-time">${e.t}</div><div class="sched-num" style="color:${e.d.cl}">${e.d.s}</div><div class="sched-inf"><div class="sched-meaning">${e.d.m}</div><div class="sched-tag">${e.d.t}</div></div><div class="sched-cd" id="cd-${e.h}-${e.m}"><span>${lbl}</span>${diff>0?'away':'past'}</div></div>`;
+  }).join('');
+}
+
+/* ══ ANGEL FIRE ══ */
+let lastFired={},histLog=[];
+function fireAngel(key,isDemo){
+  const d=ANGELS[key];if(!d)return;
+  if(!isDemo){const now=Date.now();if(lastFired[key]&&now-lastFired[key]<58000)return;}
+  lastFired[key]=Date.now();
+  playChime(d.hz);
+  document.getElementById('portal-num').textContent=d.s;
+  document.getElementById('portal-num').style.color=d.cl;
+  document.getElementById('portal-meaning').textContent=d.m.toUpperCase();
+  document.getElementById('portal-aff').textContent=d.af;
+  document.getElementById('portal-freq').textContent='✦ '+d.fr+' · '+d.t;
+  document.getElementById('portal').dataset.key=key;
+  document.getElementById('portal').classList.add('show');
+  const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  histLog.unshift({key,d,t});renderHistory();
+  // Save to DB if logged in
+  if(token) fetch(API+'/api/angel/log',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({number:d.s,meaning:d.m})}).catch(()=>{});
+  setTimeout(dismissPortal,14000);
+}
+function dismissPortal(){document.getElementById('portal').classList.remove('show');}
+function openIntention(){
+  dismissPortal();
+  const key=document.getElementById('portal').dataset.key||'1111',d=ANGELS[key]||ANGELS['1111'];
+  switchTab('angel',document.querySelectorAll('.nav-tab')[3]);
+  const hl=document.getElementById('hist-list');
+  const box=document.createElement('div');
+  box.style.cssText='background:rgba(212,175,55,.07);border:.5px solid var(--gold);border-radius:14px;padding:14px;margin-bottom:12px;';
+  box.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:5px">✦ ${d.s} · SET YOUR INTENTION</div><div style="font-size:13px;font-style:italic;color:var(--muted);margin-bottom:8px">${d.pr}</div><textarea class="method-ta" rows="2" placeholder="Write your intention here…" style="margin-bottom:8px"></textarea><button class="seal-btn" onclick="sealThis(this)">✦ Seal Intention ✦</button>`;
+  hl.prepend(box);
+}
+function sealThis(btn){btn.textContent='✦ Sealed into the Universe ✦';btn.style.color='var(--gold2)';}
+function renderHistory(){
+  const el=document.getElementById('hist-list');
+  if(!histLog.length){el.innerHTML='<div style="font-size:13px;font-style:italic;color:var(--muted);padding:4px 0;">No moments yet today…</div>';return;}
+  let w=el.querySelector('.hl');if(!w){w=document.createElement('div');w.className='hl';el.appendChild(w);}
+  w.innerHTML=histLog.map(h=>`<div class="angel-hist-item"><div style="font-family:'Cinzel',serif;font-size:14px;min-width:42px;color:${h.d.cl}">${h.d.s}</div><div style="font-size:11px;color:var(--muted);min-width:44px">${h.t}</div><div style="font-size:12px;font-style:italic;color:#3a5070">${h.d.m}</div></div>`).join('');
+  const ph=el.querySelector('div:not(.hl):not([style*="gold"])');if(ph&&histLog.length)ph.remove();
+}
+
+/* ══ CHIME ══ */
+function playChime(hz){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(hz,ctx.currentTime);g.gain.setValueAtTime(0,ctx.currentTime);g.gain.linearRampToValueAtTime(0.12,ctx.currentTime+0.4);g.gain.linearRampToValueAtTime(0,ctx.currentTime+3);o.start();o.stop(ctx.currentTime+3.1);}catch(e){}}
+
+/* ══ CLOCK ══ */
+function tick(){
+  const now=new Date(),h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  const cl=document.getElementById('clock');if(cl)cl.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  const cd=document.getElementById('clock-date');if(cd)cd.textContent=now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  if(s===0){buildSchedule();const ts=h+':'+String(m).padStart(2,'0');for(const[key,d]of Object.entries(ANGELS)){if(d.c.includes(ts)){showToast(d.s,d.m.toUpperCase());if(!lastFired[key]||Date.now()-lastFired[key]>58000)fireAngel(key,false);}}}
+  const nm=h*60+m;
+  ENTRIES.forEach(e=>{const el=document.getElementById('cd-'+e.h+'-'+e.m);if(!el)return;const diff=e.tot-nm,sp=el.querySelector('span');if(!sp)return;if(diff<=0){sp.textContent='';}else{const dh=Math.floor(diff/60),dm=diff%60;sp.textContent=dh>0?dh+'h '+dm+'m':dm+'m';}});
+}
+
+/* ══ TOAST ══ */
+let toastTmr=null;
+function showToast(num,txt){document.getElementById('toast-num').textContent=num;document.getElementById('toast-txt').textContent=txt;const t=document.getElementById('toast');t.classList.add('show');clearTimeout(toastTmr);toastTmr=setTimeout(()=>t.classList.remove('show'),4000);}
+
+/* ══ JOURNAL ══ */
+function initJournalDots(){
+  ['dots-6','dots-9'].forEach((id,i)=>{const n=i===0?6:9,el=document.getElementById(id);if(!el)return;el.innerHTML='';for(let j=0;j<n;j++){const d=document.createElement('div');d.className='rep-dot';d.onclick=function(){this.classList.toggle('filled');if(isRoyal&&token)autoSaveJournal();};el.appendChild(d);}});
+}
+async function loadTodayJournal(){
+  if(!token||!isRoyal)return;
+  const date=new Date().toISOString().split('T')[0];
+  try{
+    const res=await fetch(API+'/api/journal/'+date,{headers:{Authorization:'Bearer '+token}});
+    const data=await res.json();
+    if(data.success&&data.journal){
+      const j=data.journal;
+      document.getElementById('j-morning').value=j.morning||'';
+      const d6=document.querySelectorAll('#dots-6 .rep-dot');
+      j.afternoon.forEach((v,i)=>{if(d6[i]&&v)d6[i].classList.add('filled');});
+      const d9=document.querySelectorAll('#dots-9 .rep-dot');
+      j.night.forEach((v,i)=>{if(d9[i]&&v)d9[i].classList.add('filled');});
+    }
+  }catch(e){}
+}
+async function autoSaveJournal(){
+  if(!token||!isRoyal)return;
+  const date=new Date().toISOString().split('T')[0];
+  const afternoon=[...document.querySelectorAll('#dots-6 .rep-dot')].map(d=>d.classList.contains('filled'));
+  const night=[...document.querySelectorAll('#dots-9 .rep-dot')].map(d=>d.classList.contains('filled'));
+  fetch(API+'/api/journal/save',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({date,morning:document.getElementById('j-morning').value,afternoon,night,sealed:false})}).catch(()=>{});
+}
+async function sealJournal(){
+  if(!isRoyal){showPaywall();return;}
+  const btn=document.querySelector('.seal-btn');
+  if(token){
+    const date=new Date().toISOString().split('T')[0];
+    const afternoon=[...document.querySelectorAll('#dots-6 .rep-dot')].map(d=>d.classList.contains('filled'));
+    const night=[...document.querySelectorAll('#dots-9 .rep-dot')].map(d=>d.classList.contains('filled'));
+    await fetch(API+'/api/journal/save',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({date,morning:document.getElementById('j-morning').value,afternoon,night,sealed:true})}).catch(()=>{});
+  }
+  btn.textContent='✦ Sealed — the Universe Has Heard You ✦';btn.style.color='var(--gold2)';
+  setTimeout(()=>{btn.textContent='✦ Seal Intention into the Universe ✦';btn.style.color='var(--gold)';},3000);
+}
+
+/* ══ PAYWALL ══ */
+function showPaywall(){document.getElementById('paywall').classList.add('show');}
+function closePaywall(){document.getElementById('paywall').classList.remove('show');}
+
+function activateRoyal(){
+  isRoyal=true;
+  if(currentUser)currentUser.isRoyal=true;
+  LOCKED_FREQ.forEach(id=>{const fc=document.getElementById('fc-'+id);if(!fc)return;fc.classList.remove('locked');const li=fc.querySelector('.lock-icon');if(li)li.remove();});
+  unlockPremiumAudio();
+  const jl=document.getElementById('journal-lock');if(jl)jl.style.display='none';
+  const pill=document.getElementById('royal-pill');if(pill){pill.textContent='♛ Royal Member';pill.style.background='linear-gradient(135deg,#f5dc6e,#c09820)';}
+  closePaywall();
+}
+
+function watchAd(){
+  const btn=document.getElementById('pw-ad-btn');
+  btn.textContent='⏳ Loading ad… (simulated)';
+  setTimeout(()=>{btn.textContent='✦ 24 Hours Unlocked!';btn.style.color='var(--gold2)';setTimeout(activateRoyal,1200);},1800);
+}
+
+/* ══ RAZORPAY ══ */
+async function startRazorpay(){
+  if(typeof Razorpay==='undefined'){alert('Payment gateway loading, please try again.');return;}
+  if(!currentUser){showPaywall();showToast('!','Please log in first');return;}
+  let orderId=null;
+  // Create order on server if logged in
+  if(token){
+    try{
+      const res=await fetch(API+'/api/payment/create-order',{method:'POST',headers:{Authorization:'Bearer '+token}});
+      const data=await res.json();
+      if(data.success) orderId=data.order.id;
+    }catch(e){}
+  }
+  const options={
+    key:'rzp_live_SOSO5Va9RoNg6I',
+    amount:2200,currency:'INR',
+    name:'LUMINA',description:'Royal Access — 2 Weeks',
+    order_id:orderId||undefined,
+    theme:{color:'#D4AF37'},
+    prefill:{name:currentUser?.name||'',email:currentUser?.email||''},
+    handler:async function(response){
+      if(token){
+        try{
+          const res=await fetch(API+'/api/payment/verify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(response)});
+          const data=await res.json();
+          if(data.success){activateRoyal();showToast('♛','PAYMENT SUCCESSFUL');}
+          else{showToast('✕','Verification failed');}
+        }catch(e){activateRoyal();showToast('♛','PAYMENT SUCCESSFUL');}
+      }else{activateRoyal();showToast('♛','PAYMENT SUCCESSFUL');}
+    },
+    modal:{ondismiss:()=>showToast('—','Payment cancelled')}
+  };
+  const rzp=new Razorpay(options);
+  rzp.on('payment.failed',()=>showToast('✕','Payment failed — try again'));
+  rzp.open();
+}
+
+/* ══ DASHBOARD ══ */
+async function loadDashboard(){
+  if(!currentUser)return;
+  document.getElementById('dash-welcome').textContent='Welcome back, '+currentUser.name+' ✦';
+  document.getElementById('dash-status').textContent=isRoyal?'Royal ♛':'Free';
+  document.getElementById('dash-paid').textContent='₹'+(currentUser.totalPaid||0);
+  document.getElementById('dash-expiry').textContent=currentUser.royalExpiry?new Date(currentUser.royalExpiry).toLocaleDateString('en-IN'):'—';
+  if(!token)return;
+  try{
+    const [payRes,angRes]=await Promise.all([
+      fetch(API+'/api/payment/history',{headers:{Authorization:'Bearer '+token}}),
+      fetch(API+'/api/angel/history',{headers:{Authorization:'Bearer '+token}})
+    ]);
+    const payData=await payRes.json();
+    const angData=await angRes.json();
+    if(payData.success){
+      document.getElementById('dash-payments').innerHTML=payData.payments.length?payData.payments.map(p=>`<div class="pay-item"><div><div class="pay-id">${p.razorpayPaymentId}</div><div class="pay-date">${new Date(p.paidAt).toLocaleDateString('en-IN')}</div></div><div><div class="pay-amt">₹${p.amount}</div><div class="pay-status">SUCCESS</div></div></div>`).join(''):'<div style="font-size:13px;font-style:italic;color:var(--muted)">No payments yet.</div>';
+    }
+    if(angData.success){
+      document.getElementById('dash-angels').textContent=angData.history.length+' moments';
+      document.getElementById('dash-angel-hist').innerHTML=angData.history.slice(0,10).map(h=>`<div class="angel-hist-item"><div style="font-family:Cinzel,serif;font-size:14px;min-width:42px;color:var(--gold)">${h.number}</div><div style="font-size:11px;color:var(--muted);min-width:50px">${new Date(h.firedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div><div style="font-size:12px;font-style:italic;color:#3a5070">${h.meaning}</div></div>`).join('')||'<div style="font-size:13px;font-style:italic;color:var(--muted)">No angel moments logged yet.</div>';
+    }
+  }catch(e){}
+}
+
+/* ══ ADMIN ══ */
+async function loadAdmin(){
+  if(!token)return;
+  try{
+    const [statsRes,usersRes,payRes]=await Promise.all([
+      fetch(API+'/api/admin/stats',{headers:{Authorization:'Bearer '+token}}),
+      fetch(API+'/api/admin/users',{headers:{Authorization:'Bearer '+token}}),
+      fetch(API+'/api/admin/payments',{headers:{Authorization:'Bearer '+token}})
+    ]);
+    const stats=await statsRes.json();
+    const users=await usersRes.json();
+    const payments=await payRes.json();
+    if(stats.success){
+      document.getElementById('adm-users').textContent=stats.stats.totalUsers;
+      document.getElementById('adm-royal').textContent=stats.stats.royalUsers;
+      document.getElementById('adm-payments').textContent=stats.stats.totalPayments;
+      document.getElementById('adm-revenue').textContent='₹'+stats.stats.totalRevenue;
+    }
+    if(users.success){
+      document.querySelector('#adm-users-table tbody').innerHTML=users.users.map(u=>`<tr><td>${u.name}</td><td>${u.email}</td><td><span class="${u.isRoyal?'badge-royal':'badge-free'}">${u.isRoyal?'Royal ♛':'Free'}</span></td><td>₹${u.totalPaid||0}</td><td>${new Date(u.createdAt).toLocaleDateString('en-IN')}</td></tr>`).join('');
+    }
+    if(payments.success){
+      document.querySelector('#adm-pay-table tbody').innerHTML=payments.payments.map(p=>`<tr><td>${p.userId?.name||'—'}</td><td style="color:var(--gold)">₹${p.amount}</td><td style="font-size:10px;font-family:monospace;color:var(--muted)">${p.razorpayPaymentId}</td><td>${new Date(p.paidAt).toLocaleDateString('en-IN')}</td></tr>`).join('');
+    }
+  }catch(e){}
+}
+
+/* ══ START ══ */
+window.addEventListener('load',()=>{
+  setTimeout(()=>checkAuth(),800);
+});
+</script>
+</body>
+</html>
