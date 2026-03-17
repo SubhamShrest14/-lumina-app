@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMINA — Deploy Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B1120;--bg2:#0f1a2e;--bg3:#1a2540;--gold:#D4AF37;--gold2:#f5dc6e;--silver:#c0d0e8;--muted:#4a6080;--white:#e8f0ff;--success:#50c878;--danger:#e05050;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--silver);min-height:100vh;padding:24px 16px;}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d,3s) infinite alternate;}
+@keyframes tw{from{opacity:.03}to{opacity:var(--o,.5)}}
+.wrap{max-width:520px;margin:0 auto;position:relative;z-index:1;}
+.top{text-align:center;margin-bottom:32px;}
+.logo{font-family:'Cinzel',serif;font-size:28px;color:var(--gold);letter-spacing:5px;}
+.tagline{font-size:12px;letter-spacing:4px;color:var(--muted);margin-top:4px;}
+.subtitle{font-size:16px;font-style:italic;color:var(--silver);margin-top:12px;line-height:1.6;}
+
+/* STEPS */
+.step-card{background:rgba(15,26,46,0.95);border:0.5px solid rgba(212,175,55,0.2);border-radius:16px;padding:22px 22px;margin-bottom:14px;}
+.step-card.done{border-color:rgba(80,200,120,0.4);background:rgba(15,26,46,0.95);}
+.step-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.step-num{width:36px;height:36px;border-radius:50%;background:rgba(212,175,55,0.15);border:1px solid rgba(212,175,55,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16px;color:var(--gold);flex-shrink:0;}
+.step-num.done-num{background:rgba(80,200,120,0.15);border-color:var(--success);color:var(--success);}
+.step-title{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);letter-spacing:1px;}
+.step-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.field{margin-bottom:14px;}
+.field-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.field-hint{font-size:10px;color:rgba(212,175,55,0.5);}
+.inp{width:100%;background:rgba(11,17,32,0.8);border:0.5px solid rgba(212,175,55,0.25);border-radius:10px;padding:12px 14px;color:var(--white);font-family:'Cormorant Garamond',serif;font-size:15px;outline:none;transition:.2s;}
+.inp:focus{border-color:rgba(212,175,55,0.6);}
+.inp::placeholder{color:var(--muted);}
+.inp.filled{border-color:rgba(80,200,120,0.4);}
+.open-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.08);border:0.5px solid rgba(212,175,55,0.3);border-radius:10px;padding:10px 16px;color:var(--gold);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;cursor:pointer;text-decoration:none;transition:.2s;margin-bottom:12px;}
+.open-btn:hover{background:rgba(212,175,55,0.15);}
+.info-box{background:rgba(212,175,55,0.06);border:.5px solid rgba(212,175,55,0.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;}
+.info-box b{color:var(--silver);}
+.code{background:rgba(11,17,32,0.9);border:.5px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px 13px;font-family:monospace;font-size:12px;color:var(--gold2);margin:6px 0;word-break:break-all;}
+
+/* DOWNLOAD BUTTON */
+#download-section{display:none;}
+#download-section.show{display:block;}
+.dl-card{background:linear-gradient(135deg,rgba(212,175,55,0.15),rgba(212,175,55,0.06));border:1px solid var(--gold);border-radius:16px;padding:26px;text-align:center;margin-bottom:14px;}
+.dl-icon{font-size:44px;margin-bottom:12px;}
+.dl-title{font-family:'Cinzel',serif;font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;}
+.dl-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;}
+.dl-btn{background:linear-gradient(135deg,#D4AF37,#9a7e1f);color:#0B1120;font-family:'Cinzel',serif;font-size:14px;font-weight:700;padding:16px 40px;border-radius:30px;border:none;cursor:pointer;letter-spacing:2px;width:100%;margin-bottom:12px;transition:.2s;}
+.dl-btn:hover{opacity:.9;}
+
+/* RENDER STEPS */
+.render-steps{background:rgba(15,26,46,0.95);border:0.5px solid rgba(212,175,55,0.2);border-radius:16px;padding:22px;margin-bottom:14px;}
+.r-step{display:flex;gap:12px;padding:10px 0;border-bottom:.5px solid rgba(212,175,55,.08);}
+.r-step:last-child{border-bottom:none;}
+.r-num{width:26px;height:26px;border-radius:50%;background:rgba(212,175,55,0.1);color:var(--gold);font-family:'Cinzel',serif;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.r-body{flex:1;}
+.r-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:2px;}
+.r-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.r-desc b{color:var(--silver);}
+.render-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;background:linear-gradient(135deg,rgba(99,179,237,0.15),rgba(99,179,237,0.06));border:.5px solid rgba(99,179,237,0.4);border-radius:10px;padding:10px 18px;color:#63b3ed;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-decoration:none;transition:.2s;}
+.render-link:hover{background:rgba(99,179,237,0.2);}
+
+/* ENV TABLE */
+.env-table{width:100%;margin-top:8px;}
+.env-row{display:flex;gap:8px;margin-bottom:6px;align-items:center;}
+.env-key{font-family:monospace;font-size:11px;color:var(--gold2);background:rgba(11,17,32,.8);border-radius:6px;padding:5px 8px;min-width:180px;white-space:nowrap;}
+.env-val{font-size:11px;color:var(--muted);font-style:italic;}
+.env-val.highlight{color:var(--success);}
+
+.progress-bar{height:3px;background:rgba(212,175,55,0.1);border-radius:2px;margin-bottom:24px;overflow:hidden;}
+.progress-fill{height:3px;background:var(--gold);border-radius:2px;transition:width .4s;width:0%;}
+.progress-label{font-family:'Cinzel',serif;font-size:10px;color:var(--muted);letter-spacing:2px;text-align:right;margin-top:4px;}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="logo">✦ LUMINA</div>
+    <div class="tagline">Deployment Setup</div>
+    <div class="subtitle">Fill in your 3 secret keys below<br>and I will prepare your ready-to-deploy package</div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+  <div class="progress-label" id="prog-label">0 of 3 steps complete</div>
+
+  <!-- STEP 1: MONGODB -->
+  <div class="step-card" id="card-1">
+    <div class="step-head">
+      <div class="step-num" id="num-1">1</div>
+      <div>
+        <div class="step-title">MongoDB Connection String</div>
+        <div class="step-sub">Your free database address</div>
+      </div>
+    </div>
+    <a class="open-btn" href="https://cloud.mongodb.com" target="_blank">▶ Open MongoDB Atlas</a>
+    <div class="info-box">
+      After logging in: <b>Database → Connect → Drivers → Copy connection string</b><br>
+      Replace <b>&lt;password&gt;</b> with your DB password
+    </div>
+    <div class="field">
+      <div class="field-label">MongoDB URI <span class="field-hint">starts with mongodb+srv://</span></div>
+      <input class="inp" type="text" id="mongo-uri" placeholder="mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/" oninput="checkFields()">
+    </div>
+  </div>
+
+  <!-- STEP 2: RAZORPAY SECRET -->
+  <div class="step-card" id="card-2">
+    <div class="step-head">
+      <div class="step-num" id="num-2">2</div>
+      <div>
+        <div class="step-title">Razorpay Key Secret</div>
+        <div class="step-sub">From your Razorpay dashboard</div>
+      </div>
+    </div>
+    <a class="open-btn" href="https://dashboard.razorpay.com/app/keys" target="_blank">▶ Open Razorpay API Keys</a>
+    <div class="info-box">
+      Go to <b>Settings → API Keys</b> → copy your <b>Key Secret</b><br>
+      Your Key ID is already saved: <b>rzp_live_SOSO5Va9RoNg6I</b>
+    </div>
+    <div class="field">
+      <div class="field-label">Razorpay Key Secret <span class="field-hint">long random string</span></div>
+      <input class="inp" type="password" id="rzp-secret" placeholder="Your Razorpay Key Secret" oninput="checkFields()">
+    </div>
+  </div>
+
+  <!-- STEP 3: ADMIN EMAIL -->
+  <div class="step-card" id="card-3">
+    <div class="step-head">
+      <div class="step-num" id="num-3">3</div>
+      <div>
+        <div class="step-title">Your Admin Email</div>
+        <div class="step-sub">You will use this to log in to the admin panel</div>
+      </div>
+    </div>
+    <div class="info-box">
+      This is the email you will use to <b>register in the Lumina app</b>. That account will automatically become the admin and can see all users and payments.
+    </div>
+    <div class="field">
+      <div class="field-label">Your Email Address</div>
+      <input class="inp" type="email" id="admin-email" placeholder="your@email.com" oninput="checkFields()">
+    </div>
+  </div>
+
+  <!-- DOWNLOAD SECTION -->
+  <div id="download-section">
+    <div class="dl-card">
+      <div class="dl-icon">✦</div>
+      <div class="dl-title">Your App is Ready!</div>
+      <div class="dl-sub">All your secrets are baked in.<br>Download and upload to Render — that's it.</div>
+      <button class="dl-btn" onclick="generateEnvAndDownload()">⬇ Download Ready-to-Deploy Package</button>
+    </div>
+
+    <!-- RENDER DEPLOY STEPS -->
+    <div class="render-steps">
+      <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;">After downloading — deploy in 3 clicks:</div>
+
+      <div class="r-step">
+        <div class="r-num">1</div>
+        <div class="r-body">
+          <div class="r-title">Open Render and sign up free</div>
+          <div class="r-desc">No credit card needed</div>
+          <a class="render-link" href="https://render.com" target="_blank">▶ Open Render.com</a>
+        </div>
+      </div>
+
+      <div class="r-step">
+        <div class="r-num">2</div>
+        <div class="r-body">
+          <div class="r-title">Click "New +" → "Web Service"</div>
+          <div class="r-desc">Then choose <b>"Deploy from existing code"</b> and upload the zip file you just downloaded</div>
+        </div>
+      </div>
+
+      <div class="r-step">
+        <div class="r-num">3</div>
+        <div class="r-body">
+          <div class="r-title">Set these exact settings</div>
+          <div class="r-desc">
+            <b>Build Command:</b> npm install<br>
+            <b>Start Command:</b> node server.js<br>
+            <b>Environment:</b> Node
+          </div>
+        </div>
+      </div>
+
+      <div class="r-step">
+        <div class="r-num">4</div>
+        <div class="r-body">
+          <div class="r-title">Add environment variables</div>
+          <div class="r-desc">In Render dashboard scroll to <b>Environment Variables</b> and add these:</div>
+          <div class="env-table" id="env-preview"></div>
+        </div>
+      </div>
+
+      <div class="r-step">
+        <div class="r-num">5</div>
+        <div class="r-body">
+          <div class="r-title">Click "Create Web Service" → Done! 🎉</div>
+          <div class="r-desc">Render builds in ~2 minutes. You get a live link like <b>https://lumina-app.onrender.com</b> — your app is live for everyone!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box" style="text-align:center">
+      ✦ After it goes live, open the link → click Register → use your admin email → you will see the Admin tab automatically ✦
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Stars
+(function(){const s=document.getElementById('stars');for(let i=0;i<60;i++){const el=document.createElement('div');el.className='star';const sz=Math.random()*1.8+0.4;el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.3+Math.random()*.5};animation-delay:${Math.random()*5}s;`;s.appendChild(el);}})();
+
+function checkFields(){
+  const mongo = document.getElementById('mongo-uri').value.trim();
+  const rzp   = document.getElementById('rzp-secret').value.trim();
+  const email = document.getElementById('admin-email').value.trim();
+  let done = 0;
+
+  // Step 1
+  if(mongo.startsWith('mongodb')){
+    document.getElementById('card-1').classList.add('done');
+    document.getElementById('num-1').classList.add('done-num');
+    document.getElementById('num-1').textContent='✓';
+    document.getElementById('mongo-uri').classList.add('filled');
+    done++;
+  } else {
+    document.getElementById('card-1').classList.remove('done');
+    document.getElementById('num-1').classList.remove('done-num');
+    document.getElementById('num-1').textContent='1';
+    document.getElementById('mongo-uri').classList.remove('filled');
+  }
+
+  // Step 2
+  if(rzp.length > 10){
+    document.getElementById('card-2').classList.add('done');
+    document.getElementById('num-2').classList.add('done-num');
+    document.getElementById('num-2').textContent='✓';
+    document.getElementById('rzp-secret').classList.add('filled');
+    done++;
+  } else {
+    document.getElementById('card-2').classList.remove('done');
+    document.getElementById('num-2').classList.remove('done-num');
+    document.getElementById('num-2').textContent='2';
+    document.getElementById('rzp-secret').classList.remove('filled');
+  }
+
+  // Step 3
+  if(email.includes('@')){
+    document.getElementById('card-3').classList.add('done');
+    document.getElementById('num-3').classList.add('done-num');
+    document.getElementById('num-3').textContent='✓';
+    document.getElementById('admin-email').classList.add('filled');
+    done++;
+  } else {
+    document.getElementById('card-3').classList.remove('done');
+    document.getElementById('num-3').classList.remove('done-num');
+    document.getElementById('num-3').textContent='3';
+    document.getElementById('admin-email').classList.remove('filled');
+  }
+
+  // Progress
+  const pct = Math.round((done/3)*100);
+  document.getElementById('prog').style.width = pct+'%';
+  document.getElementById('prog-label').textContent = done+' of 3 steps complete';
+
+  // Show download when all done
+  const ds = document.getElementById('download-section');
+  if(done===3){
+    ds.classList.add('show');
+    ds.scrollIntoView({behavior:'smooth',block:'start'});
+    updateEnvPreview(mongo, rzp, email);
+  } else {
+    ds.classList.remove('show');
+  }
+}
+
+function updateEnvPreview(mongo, rzp, email){
+  const vars = [
+    {key:'MONGODB_URI', val: mongo.substring(0,30)+'...', cls:'highlight'},
+    {key:'JWT_SECRET',  val: 'lumina2024secretkey_auto', cls:'highlight'},
+    {key:'RAZORPAY_KEY_ID', val: 'rzp_live_SOSO5Va9RoNg6I', cls:''},
+    {key:'RAZORPAY_KEY_SECRET', val: '••••••••••••••', cls:'highlight'},
+    {key:'ADMIN_EMAIL', val: email, cls:'highlight'},
+    {key:'PORT', val: '3000', cls:''},
+  ];
+  document.getElementById('env-preview').innerHTML = vars.map(v=>
+    `<div class="env-row"><div class="env-key">${v.key}</div><div class="env-val ${v.cls}">${v.val}</div></div>`
+  ).join('');
+}
+
+function generateEnvAndDownload(){
+  const mongo = document.getElementById('mongo-uri').value.trim();
+  const rzp   = document.getElementById('rzp-secret').value.trim();
+  const email = document.getElementById('admin-email').value.trim();
+
+  // Create .env content
+  const envContent = `MONGODB_URI=${mongo}
+JWT_SECRET=lumina2024secretkey_${Math.random().toString(36).substring(2,10)}
+RAZORPAY_KEY_ID=rzp_live_SOSO5Va9RoNg6I
+RAZORPAY_KEY_SECRET=${rzp}
+ADMIN_EMAIL=${email}
+PORT=3000
+NODE_ENV=production`;
+
+  // Download as .env file
+  const blob = new Blob([envContent], {type:'text/plain'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = '.env';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  setTimeout(()=>{
+    alert('✦ Your .env file downloaded!\n\nNow:\n1. Open the lumina-fullstack.zip I gave you earlier\n2. Put this .env file inside it\n3. Re-zip everything\n4. Upload to Render\n\nOr just paste these values into Render\'s Environment Variables section directly.');
+  }, 500);
+}
+</script>
+</body>
+</html>
